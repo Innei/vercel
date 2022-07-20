@@ -1,7 +1,12 @@
 import cpy from 'cpy';
+import url from 'url';
+import fs from 'fs-extra';
 import execa from 'execa';
 import { join } from 'path';
-import { remove, writeFile } from 'fs-extra';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const dirRoot = join(__dirname, '..');
 const distRoot = join(dirRoot, 'dist');
@@ -15,7 +20,7 @@ export const GA_TRACKING_ID: string | undefined = ${envToString(
   )};
 export const SENTRY_DSN: string | undefined = ${envToString('SENTRY_DSN')};
 `;
-  await writeFile(filename, contents, 'utf8');
+  await fs.writeFile(filename, contents, 'utf8');
 }
 
 function envToString(key: string) {
@@ -24,6 +29,14 @@ function envToString(key: string) {
     console.log(`- Constant ${key} is not assigned`);
   }
   return JSON.stringify(value);
+}
+
+async function resolveNccBinPath() {
+  const nccPath = require.resolve('@vercel/ncc');
+  const nccRoot = join(nccPath, '../../..');
+  const nccPackageJsonPath = join(nccRoot, 'package.json');
+  const nccPackageJson = await fs.readJSON(nccPackageJsonPath);
+  return join(nccRoot, nccPackageJson.bin.ncc);
 }
 
 async function main() {
@@ -38,23 +51,25 @@ async function main() {
     // `fsevents` feature using `useFsEvents: false`, so delete the module here so
     // that it is not compiled by ncc, which makes the npm package size larger
     // than necessary.
-    await remove(join(dirRoot, '../../node_modules/fsevents'));
+    await fs.remove(join(dirRoot, '../../node_modules/fsevents'));
 
     // Compile the `doT.js` template files for `vercel dev`
-    console.log();
-    await execa(process.execPath, [join(__dirname, 'compile-templates.js')], {
-      stdio: 'inherit',
-    });
+    //console.log();
+    //await execa(process.execPath, [join(__dirname, 'compile-templates.js')], {
+    //  stdio: 'inherit',
+    //});
   }
+
+  const nccBinPath = await resolveNccBinPath();
 
   // Do the initial `ncc` build
   console.log();
-  const args = ['ncc', 'build', '--external', 'update-notifier'];
+  const args = [nccBinPath, 'build', '--external', 'update-notifier'];
   if (isDev) {
     args.push('--source-map');
   }
   args.push('src/index.ts');
-  await execa('yarn', args, { stdio: 'inherit', cwd: dirRoot });
+  await execa(process.execPath, args, { stdio: 'inherit', cwd: dirRoot });
 
   // `ncc` has some issues with `@zeit/fun`'s runtime files:
   //   - Executable bits on the `bootstrap` files appear to be lost:

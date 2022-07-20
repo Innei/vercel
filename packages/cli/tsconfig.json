@@ -3,16 +3,18 @@
     "strict": true,
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
-    "module": "commonjs",
-    "target": "ES2020",
+    "moduleResolution": "node16",
+    "module": "node16",
+    "target": "ES2020", // Node.js 14
     "esModuleInterop": true,
     "allowJs": true,
     "lib": ["ES2020"],
+    "moduleDetection": "force",
     "resolveJsonModule": true,
     "sourceMap": true,
     "outDir": "./dist",
     "typeRoots": ["./types", "./node_modules/@types"]
   },
-  "include": ["./types", "src/**/*"]
+  //"include": ["./types", "src/**/*"]
+  "include": ["./types", "src/index.ts", "src/util/pkg.ts"]
 }

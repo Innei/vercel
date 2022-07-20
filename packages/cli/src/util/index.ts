@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import { EventEmitter } from 'events';
 import qs from 'querystring';
 import { parse as parseUrl } from 'url';
 import retry from 'async-retry';

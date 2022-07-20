@@ -1,6 +1,11 @@
-const execa = require('execa');
-const { join } = require('path');
-const { readFile, writeFile, readdir, remove } = require('fs-extra');
+import execa from 'execa';
+import { join } from 'path';
+import fs from 'fs-extra';
+import url from 'url';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+const { readFile, writeFile, readdir, remove } = fs;
 
 async function main() {
   const dirRoot = join(__dirname, '..');
@@ -36,9 +41,7 @@ async function main() {
     const def = await readFile(fnPath.replace(/\.js$/, '.tsdef'), 'utf8');
     const interfaceName = def.match(/interface (\w+)/)[1];
 
-    const lines = require(fnPath)
-      .toString()
-      .split('\n');
+    const lines = (await import(fnPath)).default.toString().split('\n');
     let errorHtmlStart = -1;
     let errorHtmlEnd = -1;
     for (let i = 0; i < lines.length; i++) {

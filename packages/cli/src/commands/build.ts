@@ -27,15 +27,15 @@ import {
 } from '@vercel/routing-utils';
 import type { VercelConfig } from '@vercel/client';
 
-import pull from './pull';
-import { staticFiles as getFiles } from '../util/get-files';
-import Client from '../util/client';
-import getArgs from '../util/get-args';
-import cmd from '../util/output/cmd';
-import * as cli from '../util/pkg-name';
-import cliPkg from '../util/pkg';
-import readJSONFile from '../util/read-json-file';
-import { CantParseJSONFile } from '../util/errors-ts';
+import pull from './pull.js';
+import { staticFiles as getFiles } from '../util/get-files.js';
+import Client from '../util/client.js';
+import getArgs from '../util/get-args.js';
+import cmd from '../util/output/cmd.js';
+import * as cli from '../util/pkg-name.js';
+import cliPkg from '../util/pkg.js';
+import readJSONFile from '../util/read-json-file.js';
+import { CantParseJSONFile } from '../util/errors-ts.js';
 import {
   ProjectLinkAndSettings,
   readProjectSettings,

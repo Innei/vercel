@@ -13,7 +13,7 @@ export default async function getProjectByNameOrId(
       { accountId }
     );
     return project;
-  } catch (error) {
+  } catch (error: any) {
     if (error.status === 404) {
       return new ProjectNotFound(projectNameOrId);
     }
